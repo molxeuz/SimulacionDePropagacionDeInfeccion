@@ -1,6 +1,6 @@
 # Resident Evil UDEM  
 ### Simulación de propagación de infección en una matriz con árbol de contagio  
-**Archivo principal:** `PracticaArbolesTaller.ipynb`  
+**Archivo principal:** `simulacion.py`  
 **Desarrollado por:** `Mateo Molina Gonzalez & Manuel Gutierrez Villegas`  
 
 ---
