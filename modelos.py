@@ -1,6 +1,6 @@
 
 import random
-from typing import Dict, List
+from typing import Dict, List, Set
 
 random.seed(123)
 
@@ -79,12 +79,40 @@ class ArbolContagio:
             del self.registros[persona]
 
     def mostrar_arbol(self) -> None:
+        """Muestra el/los árbol(es) de contagio con líneas ASCII."""
         print("\nÁrbol de contagio:")
         if not self.registros:
             print("  No hay contagios aún.")
-        else:
-            for persona in self.registros:
-                print(" ", persona, "infectó a:", self.registros[persona])
+            return
+
+        # calcular raíces (infectadores que nunca aparecen como infectados)
+        infectados: Set[str] = {h for hijos in self.registros.values() for h in hijos}
+        posibles_raices: Set[str] = set(self.registros.keys()) - infectados
+
+        if not posibles_raices:
+            # si no hay raíces claras, imprime cada clave como raíz (bosque degenerado)
+            posibles_raices = set(self.registros.keys())
+
+        for i, raiz in enumerate(sorted(posibles_raices)):
+            es_ultima_raiz = (i == len(posibles_raices) - 1)
+            conector = "└── " if es_ultima_raiz else "├── "
+            print(conector + raiz)
+            self._imprimir_subarbol(raiz, prefix=("    " if es_ultima_raiz else "│   "), visitados=set())
+
+    def _imprimir_subarbol(self, nodo: str, prefix: str, visitados: Set[str]) -> None:
+        """DFS para imprimir hijos con conectores '├──', '└──', y tuberías."""
+        if nodo in visitados:
+            print(prefix + "└── (ciclo detectado)")
+            return
+        visitados.add(nodo)
+
+        hijos = sorted(self.registros.get(nodo, []))
+        for idx, hijo in enumerate(hijos):
+            es_ultimo = (idx == len(hijos) - 1)
+            conector = "└── " if es_ultimo else "├── "
+            print(prefix + conector + hijo)
+            next_prefix = prefix + ("    " if es_ultimo else "│   ")
+            self._imprimir_subarbol(hijo, next_prefix, visitados.copy())
 
 # ---------------------------------------------------
 #*                 CLASE MATRIZ 
