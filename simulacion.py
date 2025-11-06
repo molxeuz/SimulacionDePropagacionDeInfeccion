@@ -1,3 +1,4 @@
+
 from modelos import Simulacion
 
 # ===================================================
@@ -11,7 +12,6 @@ def pedir_entero(mensaje: str) -> int:
             return int(input(mensaje))
         except ValueError:
             print("Por favor ingrese un numero valido.")
-
 
 def main() -> None:
     """Ejecuta la simulación desde consola."""
@@ -46,7 +46,6 @@ def main() -> None:
             continue
         else:
             print("Opción no reconocida. Usa c, u, a o s.")
-
 
 if __name__ == "__main__":
     main()

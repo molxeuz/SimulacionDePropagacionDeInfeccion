@@ -1,3 +1,4 @@
+
 import random
 from typing import Dict, List
 
@@ -51,11 +52,9 @@ class Persona:
             return limite - 1
         return valor
 
-
 # ---------------------------------------------------
 #*         CLASE ARBOL DE CONTAGIO (QUIÉN INFECTÓ A QUIÉN)
 # ---------------------------------------------------
-
 class ArbolContagio:
     """Arbol donde se registra quién contagió a quién."""
 
@@ -86,7 +85,6 @@ class ArbolContagio:
         else:
             for persona in self.registros:
                 print(" ", persona, "infectó a:", self.registros[persona])
-
 
 # ---------------------------------------------------
 #*                 CLASE MATRIZ 
@@ -122,7 +120,6 @@ class Matriz:
         """Devuelve la lista de personas que ocupan la celda (x, y)."""
         return [p for p in lista if p.x == x and p.y == y]
 
-
 # ---------------------------------------------------
 #*                 SIMULACIÓN GENERAL
 # ---------------------------------------------------
@@ -148,9 +145,6 @@ class Simulacion:
         self.elegir_paciente_cero()
         self.BONUS_INTERVALO = max(6, ((self.tamaño // 2) + 1))            # cada cuántas rondas hay bonus
         self.BONUS_INC = 1 if self.tamaño < 12 else 2
-
-        
-        
 
     # ---------------------------------------------------
     #*              CREAR Y CONFIGURAR PERSONAS
