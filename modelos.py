@@ -1,6 +1,8 @@
 import random
 from typing import Dict, List
 
+random.seed(777)
+
 # ---------------------------------------------------
 #*                     CLASE PERSONA (UNA PERSONA EN EL MAPA)
 # ---------------------------------------------------
