@@ -22,14 +22,15 @@ class Persona:
 
     def mover_una_celda(self, tamaño_mapa: int, lista_personas: List["Persona"]) -> None:
         """Mueve a la persona aleatoriamente, pero no a una celda ocupada por otra persona sana."""
-        for _ in range(10):  # intenta hasta 10 veces encontrar un lugar donde se oueda mover
+        
+        for _ in range(10):  # intenta 10 veces encontrar un lugar donde se oueda mover
             mover_x = random.randint(-1, 1)
             mover_y = random.randint(-1, 1)
             nueva_x = self.ajustar_posicion(self.x + mover_x, tamaño_mapa)
             nueva_y = self.ajustar_posicion(self.y + mover_y, tamaño_mapa)
 
             if (nueva_x, nueva_y) == (self.x, self.y):
-                return  # no se mueve
+                return 
 
             # Verifica si hay otra persona sana a donde se va a mover
             ocupado = False
