@@ -146,7 +146,11 @@ class Matriz:
 
     def buscar_personas_celda(self, lista: List[Persona], x: int, y: int) -> List[Persona]:
         """Devuelve la lista de personas que ocupan la celda (x, y)."""
-        return [p for p in lista if p.x == x and p.y == y]
+        resultado: List[Persona] = []
+        for p in lista:
+            if p.x == x and p.y == y:
+                resultado.append(p)
+        return resultado
 
 # ---------------------------------------------------
 #*                 SIMULACIÓN GENERAL
@@ -162,6 +166,7 @@ class Simulacion:
         self.ronda: int = 0
         self.arbol: ArbolContagio = ArbolContagio()
         self.mapa: Matriz = Matriz(tamaño_mapa)
+
         if self.tamaño >= 5: 
             self.DEF_BASE = 1
             self.DEF_MAX = 2
@@ -172,7 +177,7 @@ class Simulacion:
         self.crear_personas_iniciales(cantidad_personas)
         self.elegir_paciente_cero()
         self.BONUS_INTERVALO = max(6, ((self.tamaño // 2) + 1))            # cada cuántas rondas hay bonus
-        self.BONUS_INC = 1 if self.tamaño < 12 else 2
+        self.BONUS_INC = 1
 
     # ---------------------------------------------------
     #*              CREAR Y CONFIGURAR PERSONAS
@@ -245,6 +250,7 @@ class Simulacion:
 
     def aumentar_defensa_cada_x_turnos(self) -> None:
         """Cada x rondas los sanos ganan defensa."""
+
         if self.ronda > 0 and self.ronda % self.BONUS_INTERVALO == 0:
             for persona in self.sanos:
                 persona.defensa = min(persona.defensa + self.BONUS_INC, persona.defensa_max)
@@ -252,8 +258,10 @@ class Simulacion:
     # ---------------------------------------------------
     #*                    ACCIONES EXTERNAS
     # ---------------------------------------------------
+
     def curar_persona(self, x: int, y: int) -> None:
         """Cura a una persona infectada."""
+
         for persona in self.personas:
             if persona.x == x and persona.y == y:
                 if persona.infectado:
@@ -276,6 +284,7 @@ class Simulacion:
 
     def agregar_persona(self, nombre: str, x: int, y: int) -> None:
         """Agrega una nueva persona en la posición dada."""
+
         nueva = Persona(nombre, x, y, self.DEF_BASE, self.DEF_MAX)
         self.personas.append(nueva)
         self.sanos.append(nueva)
@@ -286,6 +295,7 @@ class Simulacion:
     # ---------------------------------------------------
     def mostrar_estado(self) -> None:
         """Muestra las personas sanas e infectadas."""
+
         print("\n--- ESTADO DEL MAPA ---")
 
         print("\nPersonas infectadas:")
@@ -303,6 +313,7 @@ class Simulacion:
     # ---------------------------------------------------
     def ejecutar_ronda(self) -> None:
         """Ejecuta los pasos de una ronda completa."""
+        
         self.ronda += 1
         print("\n===== RONDA", self.ronda, "=====")
 
