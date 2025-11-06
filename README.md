@@ -7,7 +7,7 @@
 
 ## 📝 Descripción del proyecto  
 
-Este proyecto implementa una **simulación de contagios** en un entorno bidimensional, representado por una matriz cuadrada.  
+Este proyecto implementa una **simulación de contagios** en un entorno representado por una matriz cuadrada.  
 Cada celda puede estar ocupada por personas sanas o infectadas, las cuales se mueven aleatoriamente y pueden contagiar a otras al coincidir en la misma posición.  
 
 El sistema mantiene un **árbol de contagio** que registra quién contagió a quién, permitiendo visualizar las relaciones de propagación. Además, las personas sanas tienen un sistema de **defensa** que disminuye al estar expuestas a infectados y se regenera cada cierto número de rondas.  
@@ -18,7 +18,7 @@ El objetivo es observar cómo evoluciona el contagio a lo largo de las rondas, m
 
 ## ⚙️ Cómo ejecutar la simulación  
 
-1. Asegúrate de tener **Python 3.8 o superior** instalado.  
+1. Tener **Python 3.8 o superior** instalado.  
 2. Guarda los archivos del proyecto con los siguientes nombres:  
    - `modelos.py`  
    - `simulacion.py`  
