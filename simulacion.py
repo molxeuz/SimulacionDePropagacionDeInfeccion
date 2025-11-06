@@ -1,7 +1,7 @@
 from modelos import Simulacion
 
 # ===================================================
-#*   SCRIPT PRINCIPAL DE EJECUCIÓN DE LA SIMULACIÓN
+#*   sEJECUCIÓN DE LA SIMULACIÓN
 # ===================================================
 
 def pedir_entero(mensaje: str) -> int:

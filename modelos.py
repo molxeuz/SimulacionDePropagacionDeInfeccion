@@ -79,7 +79,7 @@ class ArbolContagio:
 
 
 # ---------------------------------------------------
-#*                 CLASE MATRIZ (EL MAPA)
+#*                 CLASE MATRIZ 
 # ---------------------------------------------------
 class Matriz:
     """Mapa cuadrado de tamaño fijo donde se mueven las personas."""
