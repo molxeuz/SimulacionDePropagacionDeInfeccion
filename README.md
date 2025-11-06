@@ -100,6 +100,26 @@ Coordina todo el proceso de la simulación.
 
 ---
 
+## 📸 Capturas de ejecución
+
+### 🧬 Propagación progresiva  
+![Propagación](public/propagacion.png)  
+Se observa la expansión de la infección a medida que avanzan las rondas.
+
+### 💊 Curación y reparenting  
+![Curación](public/curacion.png)  
+Muestra la recuperación de un infectado y su eliminación del árbol de contagio.
+
+### 🛡️ Incremento y decremento de defensa  
+![Defensa baja](public/defensa_baja.png)  
+![Defensa sube](public/defensa_sube.png)  
+Evidencia cómo la defensa disminuye al exponerse e incrementa por bonificación.
+
+### 🌳 Visualización del árbol por ronda  
+![Árbol de contagio](public/arbol.png)  
+Representa las relaciones de contagio actualizadas en cada ronda.
+
+
 ## 🧠 Supuestos asumidos  
 
 - Solo una persona puede ocupar una celda vacía, a menos que haya contagio.  
