@@ -32,6 +32,10 @@ def main() -> None:
             print("\nSimulación finalizada. 👋")
             break
 
+        elif len(sim.sanos) == 0 and len(sim.infectados) > 1:
+            print("Todos fueron infectados. Fin de la simulación. 😷")
+            break
+
         elif opcion == "u":
             nombre = input("Nombre de la persona a curar (ej: p2): ")
             sim.curar_persona(nombre)
