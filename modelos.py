@@ -1,26 +1,34 @@
 import random
+from typing import Dict, List
+
+# ===================================================
+#*  CONFIGURACIÓN Y CONSTANTES
+# ===================================================
+
 
 # ---------------------------------------------------
-#             CLASE PERSONA (UNA PERSONA EN EL MAPA)
+#*                     CLASE PERSONA (UNA PERSONA EN EL MAPA)
 # ---------------------------------------------------
 class Persona:
-    def __init__(self, nombre, pos_x, pos_y):
-        # Información básica
+    """Representa una persona en el mapa con posición y estado de salud."""
+
+    def __init__(self, nombre: str, pos_x: int, pos_y: int, defensa_base: int, defensa_max: int) -> None:
         self.nombre = nombre
         self.x = pos_x
         self.y = pos_y
-        
-        # Salud
-        self.defensa = 3       # puntos de defensa
-        self.infectado = False # estado de infección
 
-    # ----- Movimiento -----
-    def mover_una_celda(self, tamaño_mapa):
-        # Movimiento aleatorio -1, 0 o 1
+        self.defensa: int = defensa_base     
+        self.defensa_max: int = defensa_max    
+        self.infectado: bool = False          
+
+    #? ----- Movimiento -----
+
+    def mover_una_celda(self, tamaño_mapa: int) -> None:
+        """Mueve a la persona aleatoriamente"""
+       
         mover_x = random.randint(-1, 1)
         mover_y = random.randint(-1, 1)
 
-        # Nuevo intento de posición
         nueva_x = self.x + mover_x
         nueva_y = self.y + mover_y
 
@@ -28,11 +36,11 @@ class Persona:
         nueva_x = self.ajustar_posicion(nueva_x, tamaño_mapa)
         nueva_y = self.ajustar_posicion(nueva_y, tamaño_mapa)
 
-        # Actualizar posición
         self.x = nueva_x
         self.y = nueva_y
 
-    def ajustar_posicion(self, valor, limite):
+    def ajustar_posicion(self, valor: int, limite: int) -> int:
+        """Ajusta un valor de coordenada para que permanezca dentro del mapa."""
         if valor < 0:
             return 0
         if valor >= limite:
@@ -41,20 +49,24 @@ class Persona:
 
 
 # ---------------------------------------------------
-#         CLASE ARBOL DE CONTAGIO (QUIÉN INFECTÓ A QUIÉN)
+#*         CLASE ARBOL DE CONTAGIO (QUIÉN INFECTÓ A QUIÉN)
 # ---------------------------------------------------
 class ArbolContagio:
-    def __init__(self):
-        self.registros = {}
+    """Arbol donde se registra quién contagió a quién."""
 
-    def registrar_contagio(self, infectador, infectado):
+    def __init__(self) -> None:
+        self.registros: Dict[str, List[str]] = {}
+
+    def registrar_contagio(self, infectador: str, infectado: str) -> None:
         if infectador not in self.registros:
             self.registros[infectador] = []
         self.registros[infectador].append(infectado)
 
-    def eliminar_persona(self, persona):
+    def eliminar_persona(self, persona: str) -> None:
+        """Elimina una persona del árbol de contagio."""
+
         # quitar de todas las listas
-        for clave in self.registros:
+        for clave in list(self.registros.keys()):
             if persona in self.registros[clave]:
                 self.registros[clave].remove(persona)
 
@@ -62,7 +74,7 @@ class ArbolContagio:
         if persona in self.registros:
             del self.registros[persona]
 
-    def mostrar_arbol(self):
+    def mostrar_arbol(self) -> None:
         print("\nÁrbol de contagio:")
         if not self.registros:
             print("  No hay contagios aún.")
@@ -72,20 +84,21 @@ class ArbolContagio:
 
 
 # ---------------------------------------------------
-#                 CLASE MATRIZ (EL MAPA)
+#*                 CLASE MATRIZ (EL MAPA)
 # ---------------------------------------------------
 class Matriz:
-    def __init__(self, tamaño):
-        self.tamaño = tamaño
+    """Mapa cuadrado de tamaño fijo donde se mueven las personas."""
 
-    def imprimir_mapa(self, lista_personas):
+    def __init__(self, tamaño: int) -> None:
+        self.tamaño: int = tamaño
+
+    def imprimir_mapa(self, lista_personas: List[Persona]) -> None:
         print("\nMapa:")
 
         # Recorrer cada celda
         for fila in range(self.tamaño):
             linea = ""
             for col in range(self.tamaño):
-                
                 personas_en_celda = self.buscar_personas_celda(lista_personas, fila, col)
 
                 if len(personas_en_celda) == 0:
@@ -100,109 +113,114 @@ class Matriz:
                         linea += "🟩 "
             print(linea)
 
-    def buscar_personas_celda(self, lista, x, y):
-        resultado = []
-        for p in lista:
-            if p.x == x and p.y == y:
-                resultado.append(p)
-        return resultado
-import random
+    def buscar_personas_celda(self, lista: List[Persona], x: int, y: int) -> List[Persona]:
+        """Devuelve la lista de personas que ocupan la celda (x, y)."""
+        return [p for p in lista if p.x == x and p.y == y]
+
 
 # ---------------------------------------------------
-#                 SIMULACIÓN GENERAL
+#*                 SIMULACIÓN GENERAL
 # ---------------------------------------------------
 class Simulacion:
-    def __init__(self, tamaño_mapa, cantidad_personas):
-        # Tamaño del mapa (por ejemplo 10x10)
-        self.tamaño = tamaño_mapa
+    """Orquesta el ciclo de rondas, movimiento, contagios y visualización."""
 
-        # Lista que guardará todas las personas
-        self.personas = []
-
-        # Contador de rondas
-        self.ronda = 0
-
-        # Árbol que guarda quién contagió a quién
-        self.arbol = ArbolContagio()
-
-        # Crear el mapa
-        self.mapa = Matriz(tamaño_mapa)
-
-        # Crear personas y elegir paciente cero
+    def __init__(self, tamaño_mapa: int, cantidad_personas: int) -> None:
+        self.tamaño: int = tamaño_mapa
+        self.personas: List[Persona] = []
+        self.ronda: int = 0
+        self.arbol: ArbolContagio = ArbolContagio()
+        self.mapa: Matriz = Matriz(tamaño_mapa)
+        if self.tamaño >= 5: 
+            self.DEF_BASE = 1
+            self.DEF_MAX = 2
+        else:
+            self.DEF_BASE = max(1, self.tamaño // 4)                  # defensa inicial
+            self.DEF_MAX  = max(self.DEF_BASE, self.tamaño // 2)      # max e de defensa
+        
         self.crear_personas_iniciales(cantidad_personas)
         self.elegir_paciente_cero()
+        self.BONUS_INTERVALO = max(4, ((self.tamaño // 2) + 1))            # cada cuántas rondas hay bonus
+        self.BONUS_INC = 1 if self.tamaño < 12 else 2
+
+        
+        
 
     # ---------------------------------------------------
-    #              CREAR Y CONFIGURAR PERSONAS
+    #*              CREAR Y CONFIGURAR PERSONAS
     # ---------------------------------------------------
-    def crear_personas_iniciales(self, cantidad):
-        """Crea las personas con posiciones aleatorias."""
+    def crear_personas_iniciales(self, cantidad: int) -> None:
+        """Crea las personas con posiciones aleatorias dentro del mapa."""
+
         for i in range(cantidad):
-            nombre = "p" + str(i + 1)
+            nombre = f"p{i + 1}"
             x = random.randint(0, self.tamaño - 1)
             y = random.randint(0, self.tamaño - 1)
-            nueva_persona = Persona(nombre, x, y)
+            nueva_persona = Persona(nombre, x, y, defensa_base=self.DEF_BASE, defensa_max=self.DEF_MAX)
             self.personas.append(nueva_persona)
 
-    def elegir_paciente_cero(self):
+    def elegir_paciente_cero(self) -> None:
         """Elige una persona al azar para comenzar infectada."""
+
         paciente = random.choice(self.personas)
         paciente.infectado = True
         self.arbol.registros[paciente.nombre] = []
 
     # ---------------------------------------------------
-    #                   LÓGICA DEL JUEGO
+    #*                   LÓGICA DEL JUEGO
     # ---------------------------------------------------
-    def mover_todas_las_personas(self):
+    def mover_todas_las_personas(self) -> None:
         """Hace que todas las personas se muevan una celda."""
+
         for persona in self.personas:
             persona.mover_una_celda(self.tamaño)
 
-    def revisar_contagios(self):
+    def revisar_contagios(self) -> None:
         """Verifica si hay contagios entre personas en la misma celda."""
+
         for persona in self.personas:
-            if persona.infectado == False:
+            if persona.infectado is False:
                 infectados = self.buscar_infectados_en_misma_celda(persona)
 
-                # Si hay infectados, baja la defensa
+                # Si hay infectados en la misma celda le quita defensa
                 if len(infectados) > 0:
                     persona.defensa -= len(infectados)
 
-                    # Si la defensa llega a 0, se contagia
+                    # Si la defensa llega a 0 se contagia
                     if persona.defensa <= 0:
                         self.infectar_persona(persona, infectados)
 
-    def buscar_infectados_en_misma_celda(self, persona):
+    def buscar_infectados_en_misma_celda(self, persona: Persona) -> List[Persona]:
         """Devuelve una lista de infectados que están en la misma posición."""
-        infectados = []
-        for otro in self.personas:
-            if otro.x == persona.x and otro.y == persona.y and otro.infectado:
-                infectados.append(otro)
-        return infectados
 
-    def infectar_persona(self, persona, infectadores):
+        return [
+            otro for otro in self.personas
+            if (otro.x == persona.x and otro.y == persona.y and otro.infectado)
+        ]
+
+    def infectar_persona(self, persona: Persona, infectadores: List[Persona]) -> None:
         """Marca a una persona como infectada y registra quién la contagió."""
+
         persona.infectado = True
         quien_contagio = random.choice(infectadores)
         self.arbol.registrar_contagio(quien_contagio.nombre, persona.nombre)
 
-    def aumentar_defensa_cada_3_turnos(self):
-        """Cada 3 rondas, los sanos ganan un punto de defensa."""
-        if self.ronda % 3 == 0 and self.ronda > 0:
+    def aumentar_defensa_cada_x_turnos(self) -> None:
+        """Cada x rondas los sanos ganan defensa."""
+        if self.ronda > 0 and self.ronda % self.BONUS_INTERVALO == 0:
             for persona in self.personas:
-                if persona.infectado == False:
-                    persona.defensa += 1
+                if not persona.infectado:
+                    persona.defensa = min(persona.defensa + self.BONUS_INC, persona.defensa_max)
 
     # ---------------------------------------------------
-    #                    ACCIONES EXTERNAS
+    #*                    ACCIONES EXTERNAS
     # ---------------------------------------------------
-    def curar_persona(self, nombre):
+    def curar_persona(self, nombre: str) -> None:
         """Cura a una persona infectada."""
         for persona in self.personas:
             if persona.nombre == nombre:
                 if persona.infectado:
                     persona.infectado = False
-                    persona.defensa = 3
+                    persona.defensa = self.DEF_BASE
                     self.arbol.eliminar_persona(nombre)
                     print(nombre, "ha sido curado.")
                     return
@@ -211,49 +229,42 @@ class Simulacion:
                     return
         print("No existe una persona con ese nombre.")
 
-    def agregar_persona(self, nombre, x, y):
+    def agregar_persona(self, nombre: str, x: int, y: int) -> None:
         """Agrega una nueva persona en la posición dada."""
-        nueva = Persona(nombre, x, y)
+        nueva = Persona(nombre, x, y, self.DEF_BASE, self.DEF_MAX)
         self.personas.append(nueva)
         print("Persona agregada:", nombre)
 
     # ---------------------------------------------------
-    #                    MOSTRAR ESTADO
+    #*                    MOSTRAR ESTADO
     # ---------------------------------------------------
-    def mostrar_estado(self):
+    def mostrar_estado(self) -> None:
         """Muestra las personas sanas e infectadas."""
         print("\n--- ESTADO DEL MAPA ---")
+
+        print("\nPersonas infectadas:")
+        for p in self.personas:
+            if p.infectado:
+                print(" ", p.nombre)
+    
+        self.arbol.mostrar_arbol()
 
         print("Personas sanas:")
         for p in self.personas:
             if not p.infectado:
                 print(" ", p.nombre, "defensa:", p.defensa)
 
-        print("\nPersonas infectadas:")
-        for p in self.personas:
-            if p.infectado:
-                print(" ", p.nombre)
-
-        # Mostrar árbol de contagio
-        self.arbol.mostrar_arbol()
-
     # ---------------------------------------------------
-    #                EJECUTAR UNA RONDA
+    #*                EJECUTAR UNA RONDA
     # ---------------------------------------------------
-    def ejecutar_ronda(self):
+    def ejecutar_ronda(self) -> None:
         """Ejecuta los pasos de una ronda completa."""
         self.ronda += 1
         print("\n===== RONDA", self.ronda, "=====")
 
-        # 1. Mover personas
         self.mover_todas_las_personas()
-
-        # 2. Revisar contagios
         self.revisar_contagios()
+        self.aumentar_defensa_cada_x_turnos()
 
-        # 3. Subir defensa si corresponde
-        self.aumentar_defensa_cada_3_turnos()
-
-        # 4. Mostrar el mapa y el estado
-        self.mapa.imprimir_mapa(self.personas)
         self.mostrar_estado()
+        self.mapa.imprimir_mapa(self.personas)
