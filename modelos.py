@@ -252,26 +252,26 @@ class Simulacion:
     # ---------------------------------------------------
     #*                    ACCIONES EXTERNAS
     # ---------------------------------------------------
-    def curar_persona(self, nombre: str) -> None:
+    def curar_persona(self, x: int, y: int) -> None:
         """Cura a una persona infectada."""
         for persona in self.personas:
-            if persona.nombre == nombre:
+            if persona.x == x and persona.y == y:
                 if persona.infectado:
                     persona.infectado = False
                     persona.defensa = self.DEF_BASE
-                    self.arbol.eliminar_persona(nombre)
+                    self.arbol.eliminar_persona(persona.nombre)
 
                     if persona in self.infectados:
                         self.infectados.remove(persona)
                     if persona not in self.sanos:
                         self.sanos.append(persona)
 
-                    print(nombre, "ha sido curado.")
+                    print(persona.nombre, "ha sido curado.")
                     return
                 else:
-                    print(nombre, "no está infectado.")
+                    print(persona.nombre, "no está infectado.")
                     return
-        print("No existe una persona con ese nombre.")
+        print("No existe una persona en esa posición.")
 
 
     def agregar_persona(self, nombre: str, x: int, y: int) -> None:
