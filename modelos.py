@@ -79,40 +79,70 @@ class ArbolContagio:
             del self.registros[persona]
 
     def mostrar_arbol(self) -> None:
-        """Muestra el/los árbol(es) de contagio con líneas ASCII."""
+        """Imprime el/los árbol(es) de contagio en ASCII y muestra la traza más larga."""
         print("\nÁrbol de contagio:")
         if not self.registros:
             print("  No hay contagios aún.")
             return
 
-        # calcular raíces (infectadores que nunca aparecen como infectados)
-        infectados: Set[str] = {h for hijos in self.registros.values() for h in hijos}
-        posibles_raices: Set[str] = set(self.registros.keys()) - infectados
+        # calcular raíces: claves que nunca aparecen como hijos
+        infectados = {h for hijos in self.registros.values() for h in hijos}
+        raices = set(self.registros.keys()) - infectados
+        if not raices:
+            raices = set(self.registros.keys())
+        raices_ordenadas = sorted(raices)
 
-        if not posibles_raices:
-            # si no hay raíces claras, imprime cada clave como raíz (bosque degenerado)
-            posibles_raices = set(self.registros.keys())
+        # ---------- funciones internas ----------
+        def imprimir_subarbol(nodo: str, pref: str, visitados: set) -> None:
+            """Imprime recursivamente los hijos con conectores ASCII."""
+            if nodo in visitados:
+                print(pref + "└── (ciclo detectado)")
+                return
+            visitados.add(nodo)
+            hijos = sorted(self.registros.get(nodo, []))
+            for i, h in enumerate(hijos):
+                es_ultimo = (i == len(hijos) - 1)
+                con = "└── " if es_ultimo else "├── "
+                print(pref + con + h)
+                siguiente_pref = pref + ("    " if es_ultimo else "│   ")
+                imprimir_subarbol(h, siguiente_pref, visitados.copy())
 
-        for i, raiz in enumerate(sorted(posibles_raices)):
-            es_ultima_raiz = (i == len(posibles_raices) - 1)
+        def camino_mas_largo_desde(nodo: str, visitados: set) -> list:
+            """
+            Devuelve lista con el camino más largo desde 'nodo'.
+            Evita ciclos usando 'visitados'.
+            """
+            if nodo in visitados:
+                return [nodo]
+            visitados = visitados | {nodo}
+            mejor = [nodo]
+            for h in sorted(self.registros.get(nodo, [])):
+                camino = camino_mas_largo_desde(h, visitados)
+                if len(camino) + 1 > len(mejor):
+                    mejor = [nodo] + camino
+            return mejor
+        # ----------------------------------------
+
+        # imprimir cada raíz y su subárbol
+        for i, raiz in enumerate(raices_ordenadas):
+            es_ultima_raiz = (i == len(raices_ordenadas) - 1)
             conector = "└── " if es_ultima_raiz else "├── "
             print(conector + raiz)
-            self._imprimir_subarbol(raiz, prefix=("    " if es_ultima_raiz else "│   "), visitados=set())
+            pref = "    " if es_ultima_raiz else "│   "
+            imprimir_subarbol(raiz, pref, set())
 
-    def _imprimir_subarbol(self, nodo: str, prefix: str, visitados: Set[str]) -> None:
-        """DFS para imprimir hijos con conectores '├──', '└──', y tuberías."""
-        if nodo in visitados:
-            print(prefix + "└── (ciclo detectado)")
-            return
-        visitados.add(nodo)
+        # calcular traza más larga entre todas las raíces y mostrarla
+        mejor_total = []
+        for raiz in raices_ordenadas:
+            camino = camino_mas_largo_desde(raiz, set())
+            if len(camino) > len(mejor_total):
+                mejor_total = camino
 
-        hijos = sorted(self.registros.get(nodo, []))
-        for idx, hijo in enumerate(hijos):
-            es_ultimo = (idx == len(hijos) - 1)
-            conector = "└── " if es_ultimo else "├── "
-            print(prefix + conector + hijo)
-            next_prefix = prefix + ("    " if es_ultimo else "│   ")
-            self._imprimir_subarbol(hijo, next_prefix, visitados.copy())
+        if mejor_total:
+            print("\nTraza más larga del contagio:")
+            print(" → ".join(mejor_total))
+        else:
+            print("\nNo se encontró traza más larga.")
 
 # ---------------------------------------------------
 #*                 CLASE MATRIZ 
